@@ -118,7 +118,7 @@ def combine_csv_data():
     ships_df = pd.read_csv(ships_csv)
 
     # Concatenate the data frames horizontally
-    combined_df = pd.concat([people_df, planets_df, ships_df], axis=1)
+    combined_df = pd.concat([people_df, planets_df, ships_df], axis=0)
 
     return combined_df
 
