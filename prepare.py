@@ -9,6 +9,9 @@ from sklearn.preprocessing import MinMaxScaler
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+import os
+import acquire as a
+
 def split_data(df):
     '''
     take in a DataFrame and target variable. return train, validate, and test DataFrames.
@@ -239,3 +242,95 @@ DataFrame value counts:
         sns.histplot(df_clean[col])
         plt.title(f'Histogram of {col}')
         plt.show()  
+
+def get_superstore():
+    # Check if the CSV file exists
+    if os.path.exists('superstore_prepped.csv'):
+        # If the file exists, load it into a data frame
+        df = pd.read_csv('superstore_prepped.csv')
+         # set datetime
+        df.sale_date = pd.to_datetime(df.sale_date)
+         # set index as date
+        df = df.set_index('sale_date')
+        # sort index
+        df = df.sort_index()
+    else:
+        
+        #get and read csv
+        df = pd.read_csv('ts_superstore.csv', index_col=0)
+
+        # format sale date
+        df.sale_date = df.sale_date.str.replace('00:00:00 GMT','')
+
+        # remove wihite space
+        df.sale_date = df.sale_date.str.strip()
+
+        # change to date and time
+        df.sale_date = pd.to_datetime(df.sale_date, format='%a, %d %b %Y')
+
+        #set index as sale_date
+        df = df.set_index('sale_date')
+
+        #sort index values
+        df = df.sort_index()
+
+        #add day of week column
+        df['day_of_week'] = df.index.day_name()
+
+        #add month column
+        df['month'] = df.index.month_name()
+
+        #add sales total column
+        df['sales_total']= (df.sale_amount * df.item_price)
+
+        # Write the data frame to a CSV file
+        df.to_csv('superstore_prepped.csv', index=True)
+
+    return df
+
+def get_germany():
+    # check if csv exists
+    if os.path.exists('germany_power_prepped.csv'):
+        # If the file exists, load it into a data frame
+        df = pd.read_csv('germany_power_prepped.csv')
+         # set datetime
+        df.date = pd.to_datetime(df.date)
+         # set index as date
+        df = df.set_index('date')
+        # sort index
+        df = df.sort_index()
+    else:
+        # define data source
+        url = 'https://raw.githubusercontent.com/jenfly/opsd/master/opsd_germany_daily.csv'
+        
+        # turn into df from acquire function
+        df = a.get_power(url)
+
+        # rename columns
+        df = df.rename(columns={'Date':'date','Consumption':'consumption','Wind':'wind','Solar':'solar','Wind+Solar':'wind_solar'})
+
+        # set datetime
+        df.date = pd.to_datetime(df.date)
+
+        # set index as date
+        df = df.set_index('date')
+
+        # sort index
+        df = df.sort_index()
+
+        # add month column
+        df['month'] = df.index.month_name() 
+
+        # add year column
+        df['year'] = df.index.strftime('%Y')
+
+        # drop nulls
+        df = df.dropna()
+
+        # create other sources of energy column
+        df['other_energy_sources'] = df.consumption - df.wind_solar
+
+        # Write the data frame to a CSV file
+        df.to_csv('germany_power_prepped.csv', index=True)
+    
+    return df
