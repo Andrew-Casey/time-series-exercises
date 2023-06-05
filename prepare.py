@@ -122,9 +122,9 @@ DataFrame value counts:
         print(f"""******** {col.upper()} - Value Counts:
 {df[col].value_counts()}
     _______________________________________""")                   
-        
+
 # fig, axes = plt.subplots(1, len(get_numeric_cols(df)), figsize=(15, 5))
-    
+
     for col in get_numeric_cols(df):
         sns.histplot(df[col])
         plt.title(f'Histogram of {col}')
@@ -235,9 +235,9 @@ DataFrame value counts:
         print(f"""******** {col.upper()} - Value Counts:
 {df_clean[col].value_counts()}
     _______________________________________""")                   
-        
+
 # fig, axes = plt.subplots(1, len(get_numeric_cols(df)), figsize=(15, 5))
-    
+
     for col in get_numeric_cols(df_clean):
         sns.histplot(df_clean[col])
         plt.title(f'Histogram of {col}')
